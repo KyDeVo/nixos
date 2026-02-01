@@ -19,33 +19,41 @@
   time.timeZone = "Europe/Kyiv";
   i18n.defaultLocale = "en_US.UTF-8";
 
+  services.resolved.enable = true;
   networking = {
     hostName = "nixos";
-    networkmanager.enable = false;
-    useDHCP = true;
+    useDHCP = lib.mkDefault true;
+    networkmanager.enable = true;
     wireless = {
       enable = false;
       iwd = {
         enable = true;
-	settings = {
-	  General = {
-	    EnableNetworkConfiguration = true;
-	    AutoConnect = true;
-	  };
-	};
+        settings = {
+          General = {
+            EnableNetworkConfiguration = true;
+            AutoConnect = true;
+          };
+          Network = {
+            EnableIPv6 = true;
+          };
+        };
       };
     };
     firewall = {
       enable = true;
-      allowedTCPPorts = [ 22 ];
+      allowedTCPPorts = [ ];
       allowedUDPPorts = [ ];
     };
+    nameservers = [
+      "1.1.1.1"
+      "8.8.8.8"
+    ];
   };
 
   users.users.kyd0 = {
     isNormalUser = true;
     description = "reKyd0";
-    extraGroups = [ "wheel" ];
+    extraGroups = [ "wheel" "video" "audio" "input" ];
     shell = pkgs.zsh;
     packages = with pkgs; [
       ranger
@@ -114,22 +122,19 @@
 
   xdg.portal = {
     enable = true;
-    extraPortals = [
-      pkgs.xdg-desktop-portal-hyprland
+    extraPortals = with pkgs; [
+      xdg-desktop-portal-hyprland
     ];
-  };
+  }; 
 
   programs.nix-ld.enable = true;
   programs.zsh = {
     enable = true;
-    autosuggestions.enable = true;
-    enableCompletion = true;
     syntaxHighlighting.enable = true;
 
     shellAliases = {
-      sv = "sudo -v";
-      hy = "sudo nvim /home/kyd0/.config/hypr/hyprland.conf";
-      cfg = "zeditor /home/kyd0/.config";
+      hy = "sudo nvim /home/kydo/.config/hypr/hyprland.conf";
+      cfg = "codium /home/kyd0/.config";
       nx = "sudo nvim /etc/nixos/configuration.nix";
       rb = "sudo nixos-rebuild switch";
     };
